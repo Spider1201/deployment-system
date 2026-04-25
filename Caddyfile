@@ -1,0 +1,27 @@
+:80 {
+    # API routes go directly to backend
+    handle /api* {
+        uri strip_prefix /api
+        reverse_proxy api:5000
+    }
+
+    # App/deployment routes go to backend
+    handle /app* {
+        reverse_proxy api:5000
+    }
+
+    # Logs endpoint (SSE)
+    handle /logs* {
+        reverse_proxy api:5000
+    }
+
+    # Deployments API
+    handle /deployments {
+        reverse_proxy api:5000
+    }
+
+    # Frontend (default)
+    handle {
+        reverse_proxy frontend:5173
+    }
+}

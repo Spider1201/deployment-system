@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backend:/app
+      - /tmp/projects:/tmp/projects
+      - /tmp/uploads:/tmp/uploads
+    environment:
+      - NODE_ENV=production
+    networks:
+      - mini-paas
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://api:5000
+    networks:
+      - mini-paas
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - mini-paas
+    depends_on:
+      - api
+
+networks:
+  mini-paas:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
