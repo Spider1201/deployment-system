@@ -200,6 +200,8 @@ app.get("/logs/:id", (req, res) => {
   });
 });
 
+
+
 app.get("/app/:id", (req, res) => {
   const deployment = deployments.find((d) => d.id === req.params.id);
 

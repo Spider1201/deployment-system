@@ -173,6 +173,19 @@ export default function Dashboard() {
                 <p style={{ margin: "5px 0" }}>
                   <strong>Route:</strong> {d.route}
                 </p>
+                {d.status === "running" && (
+                  <p style={{ margin: "5px 0" }}>
+                    <strong>Access:</strong>{" "}
+                    <a
+                      href={`/app/${d.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#007bff", textDecoration: "underline" }}
+                    >
+                      http://localhost/app/{d.id}
+                    </a>
+                  </p>
+                )}
               </div>
               <div
                 style={{

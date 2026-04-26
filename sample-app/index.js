@@ -10,14 +10,15 @@ app.get('/', (req, res) => {
         <title>Sample App</title>
         <style>
           body {
+            display: flex;
+            justify-content: center;
             font-family: Arial, sans-serif;
             padding: 40px;
             background: #f7f7f7;
           }
 
           .box {
-            display: flex;
-            justify-content: center;
+           
             background: #fff;
             padding: 20px;
             border: 1px solid #ddd;
