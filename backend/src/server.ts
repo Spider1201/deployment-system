@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { writeDockerfile } from "./dockerfile-generator";
 
 const execAsync = promisify(exec);
 
@@ -111,27 +112,24 @@ app.post("/deploy", upload.single("project"), async (req, res) => {
         throw new Error("No Git URL or project file provided");
       }
 
-      // Build with Railpack
+      // Build with Railpack-equivalent framework detection
       deployment.status = "building";
-      addLog(deployment, "Building started with Railpack...");
+      addLog(deployment, "Building started...");
 
-      // Check if Railpack is available, otherwise fall back to Docker build
+      // Generate Dockerfile based on app framework detection
+      addLog(deployment, "Detecting application framework...");
+      try {
+        writeDockerfile(projectPath);
+        addLog(deployment, "Dockerfile generated (framework auto-detected)");
+      } catch (err: any) {
+        addLog(deployment, `Dockerfile generation failed: ${err.message}`);
+        throw err;
+      }
+
+      // Verify Dockerfile was created
       const dockerfilePath = path.join(projectPath, "Dockerfile");
-      const hasDockerfile = fs.existsSync(dockerfilePath);
-
-      if (!hasDockerfile) {
-        addLog(deployment, "No Dockerfile found, using Railpack...");
-        try {
-          await execAsync(`railpack --project ${projectPath} --tag mini-paas:${id}`, {
-            cwd: projectPath
-          });
-          addLog(deployment, "Railpack build completed");
-        } catch (err: any) {
-          addLog(deployment, "Railpack not available, creating basic Dockerfile...");
-          createBasicDockerfile(projectPath);
-        }
-      } else {
-        addLog(deployment, "Using existing Dockerfile");
+      if (!fs.existsSync(dockerfilePath)) {
+        throw new Error("Failed to generate Dockerfile");
       }
 
       // Build Docker image
@@ -228,7 +226,9 @@ app.get("/app/:id", (req, res) => {
           <p><strong>Image:</strong> ${deployment.imageTag || "N/A"}</p>
           <p><strong>Container:</strong> ${deployment.containerId ? deployment.containerId.substring(0, 12) : "N/A"}</p>
           <p><strong>Port:</strong> ${deployment.port || "N/A"}</p>
-          <p><strong>Created:</strong> ${new Date(deployment.createdAt).toLocaleString()}</p>
+          <p><strong>Created:</strong> ${new Date(deployment.createdAt).toLocaleString("en-NG", {
+            timeZone: "Africa/Lagos"
+        })}</p>
           <hr />
           <h2>Logs</h2>
           <pre style="background: #000; color: #0f0; padding: 10px; border-radius: 3px; overflow: auto; max-height: 400px;">
@@ -240,19 +240,7 @@ ${deployment.logs.join("\n")}
   `);
 });
 
-// Helper functions
 
-const createBasicDockerfile = (projectPath: string) => {
-  const dockerfile = `FROM node:22-slim
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-`;
-  fs.writeFileSync(path.join(projectPath, "Dockerfile"), dockerfile);
-};
 
 const buildDockerImage = async (
   imageTag: string,
@@ -262,9 +250,8 @@ const buildDockerImage = async (
   return new Promise((resolve, reject) => {
     const tar = require("tar");
 
-    const tarStream = tar.create({ cwd: projectPath }, ["."], (error: any) => {
-      if (error) reject(error);
-    });
+    // Create tar stream 
+    const tarStream = tar.create({ cwd: projectPath }, ["."]);
 
     docker.buildImage(tarStream, { t: imageTag }, (error: any, response: any) => {
       if (error) {
@@ -292,7 +279,7 @@ const buildDockerImage = async (
               addLog(deployment, json.stream.trim());
             }
           } catch {
-            // Skip non-JSON lines
+            
           }
         });
       });
@@ -322,7 +309,7 @@ const runContainer = async (
   return (container as any).id;
 };
 
-// Error handling
+// handling the errors globally
 app.use(
   (
     error: any,

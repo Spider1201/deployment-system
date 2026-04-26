@@ -9,7 +9,7 @@ export default function Dashboard() {
 
   // In Docker, use relative paths to let the browser talk through Caddy
   // In dev, use localhost:5000 directly
-  const apiUrl = typeof window !== "undefined" && window.location.hostname === "localhost" 
+  const apiUrl = typeof window !== "undefined" && window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "";
 
@@ -85,10 +85,10 @@ export default function Dashboard() {
   return (
     <div style={{ padding: 20 }}>
       <h1>Mini PaaS Dashboard</h1>
-      
-      <div style={{ 
-        background: "#f5f5f5", 
-        padding: 20, 
+
+      <div style={{
+        background: "#f5f5f5",
+        padding: 20,
         borderRadius: 5,
         marginBottom: 20
       }}>
@@ -96,7 +96,7 @@ export default function Dashboard() {
         <form onSubmit={deploy}>
           <input
             type="text"
-            placeholder="Git repository URL (e.g., https://github.com/user/repo.git)"
+            placeholder="Enter a Git repository URL (e.g., https://github.com/user/repo.git)"
             value={gitUrl}
             onChange={(e) => setGitUrl(e.target.value)}
             style={{

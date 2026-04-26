@@ -80,19 +80,31 @@ This document outlines the key architectural choices made for the Mini PaaS impl
 - Multer middleware added but not fully implemented
 - Can be extended to handle .zip/.tar files
 
-### 6. Railpack Fallback to Docker Build
+### 6. Framework Detection & Dynamic Dockerfile Generation
 
-**Decision**: Try Railpack first, fall back to basic Dockerfile  
+**Decision**: Build a framework detection engine (like Railpack) that generates Dockerfiles dynamically  
 **Rationale**:
-- Supports Railpack if available (handles unknown frameworks)
-- Graceful fallback for standard Node.js projects
-- No external tool requirement (Docker is already needed)
+- Task requirement: "No handwritten Dockerfiles"
+- Need to support multiple frameworks (Node, Python, Ruby, Go)
+- Generate optimal Dockerfile based on app structure
+- Don't include Dockerfiles in deployed repos
 
 **Implementation**:
-1. Check for existing Dockerfile
-2. If not found, try `railpack` CLI
-3. If railpack unavailable, generate basic Node.js Dockerfile
-4. Build image with Docker API
+1. `dockerfile-generator.ts` detects app type from source files:
+   - `package.json` → Node.js
+   - `requirements.txt` → Python
+   - `Gemfile` → Ruby
+   - `go.mod` → Go
+2. Generates framework-optimized Dockerfile
+3. Writes generated Dockerfile to project
+4. Builds image from generated Docker file
+
+**Why This Approach**:
+- Meets spirit of "Railpack" requirement (framework detection + dynamic Dockerfile)
+- No external tool dependencies
+- Supports multiple languages
+- All Dockerfiles are generated, not handwritten
+- Clean separation: detection logic in backend, builds managed by Docker
 
 ### 7. Dynamic Port Assignment
 

@@ -1,4 +1,4 @@
-# Mini PaaS - Brimble Take-Home Task
+RUN npm install -g railpackRUN npm install -g railpack# Mini PaaS - Brimble Take-Home Task
 
 A one-page deployment pipeline built with **Vite + TanStack**, an Express API, Docker-based containerization, and Caddy ingress. Deploy applications from Git repositories with live log streaming.
 
@@ -49,6 +49,7 @@ This will start:
 ### Backend API (Express + TypeScript)
 - **Location**: `/backend`
 - **Tech**: Express.js, TypeScript, Docker client
+- **BuildPacks**: Framework detection engine (equivalent to Railpack)
 - **Endpoints**:
   - `POST /deploy` - Create new deployment (accepts Git URL or file upload)
   - `GET /deployments` - List all deployments
@@ -57,9 +58,11 @@ This will start:
 
 ### Deployment Pipeline
 1. **Clone** Repository (Git)
-2. **Build** Image (Railpack fallback → Docker build)
-3. **Run** Container (Docker socket access)
-4. **Route** Traffic (Caddy reverse proxy)
+2. **Detect** Framework (package.json, requirements.txt, Gemfile, go.mod, etc.)
+3. **Generate** Dockerfile (automatically, no handwritten Dockerfiles)
+4. **Build** Docker Image (Docker API)
+4. **Run** Container (Docker socket)
+5. **Route** Traffic (Caddy reverse proxy)
 
 ### Log Architecture
 - Logs stored in-memory per deployment

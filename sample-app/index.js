@@ -1,30 +1,45 @@
 const express = require('express');
 const app = express();
+
 const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.send(`
+    res.send(`
     <html>
       <head>
-        <title>Sample App on Mini PaaS</title>
+        <title>Sample App</title>
         <style>
-          * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-          body { margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-          .container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
-          h1 { margin: 0 0 20px 0; color: #333; }
-          p { color: #666; line-height: 1.6; margin: 10px 0; }
-          .info { background: #f0f0f0; padding: 15px; border-radius: 5px; margin-top: 20px; }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f7f7f7;
+          }
+
+          .box {
+            display: flex;
+            justify-content: center;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            max-width: 500px;
+          }
+
+          h1 {
+            margin-top: 0;
+          }
         </style>
       </head>
       <body>
-        <div class="container">
-          <h1>🚀 Sample App</h1>
-          <p>This is a sample application successfully deployed on Mini PaaS!</p>
-          <div class="info">
-            <p><strong>Port:</strong> ${port}</p>
-            <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-            <p><strong>Node Version:</strong> ${process.version}</p>
-          </div>
+        <div class="box">
+          <h1>The Sample-App Is Running</h1>
+          <p>This app was deployed successfully.</p>
+
+          <hr />
+
+          <p><b>Port:</b> ${port}</p>
+          <p><b>Time:</b> ${new Date().toLocaleString("en-NG", {
+            timeZone: "Africa/Lagos"
+        })}</p>
         </div>
       </body>
     </html>
@@ -32,5 +47,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Sample app listening on port ${port}`);
+    console.log('App running on port ' + port);
 });
