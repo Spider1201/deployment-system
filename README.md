@@ -32,7 +32,7 @@ This will start:
 ### First Deployment
 
 1. Open http://localhost in your browser
-2. Enter a Git repository URL (e.g., `https://github.com/user/repo.git`)
+2. Enter the Git repository URL  `https://github.com/Spider1201/sample-app.git`
 3. Click **Deploy**
 4. Watch logs stream live as the build and deployment progresses
 
